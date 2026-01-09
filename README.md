@@ -298,7 +298,7 @@ class CodeGeneratorAgent extends DurableObject {
 ```javascript
 // Generated apps deployed to dispatch namespace
 function isWebSocket(req) {
-  return req.headers.get("Upgrade") === "websocket";
+  return (req.headers.get("Upgrade") || "").toLowerCase() === "websocket";
 }
 
 export default {
