@@ -297,13 +297,65 @@ class CodeGeneratorAgent extends DurableObject {
 ### Workers for Platforms Deployment
 ```javascript
 // Generated apps deployed to dispatch namespace
+function isWebSocket(req) {
+  return req.headers.get("Upgrade") === "websocket";
+}
+
 export default {
   async fetch(request, env) {
+
+    const url = new URL(request.url);
+
+    // SIMPLE TEST WEBSOCKET
+    if (url.pathname === "/api/ws-test") {
+
+      if (!isWebSocket(request)) {
+        return new Response("WebSocket only", { status: 426 });
+      }
+
+      const pair = new WebSocketPair();
+      const client = pair[0];
+      const server = pair[1];
+
+      server.accept();
+
+      server.addEventListener("message", (e) => {
+        server.send("echo: " + e.data);
+      });
+
+      return new Response(null, {
+        status: 101,
+        webSocket: client
+      });
+    }
+
+    // REAL AGENT WEBSOCKET
+    if (url.pathname.includes("/ws")) {
+
+      if (!isWebSocket(request)) {
+        return new Response("WebSocket only", { status: 426 });
+      }
+
+      const pair = new WebSocketPair();
+      const client = pair[0];
+      const server = pair[1];
+
+      server.accept();
+      server.send("CONNECTED OK");
+
+      return new Response(null, {
+        status: 101,
+        webSocket: client
+      });
+    }
+
+    // NORMAL REQUESTS
     const appId = extractAppId(request);
     const userApp = env.DISPATCHER.get(appId);
     return await userApp.fetch(request);
   }
 };
+
 ```
 
 ### Iteration-based Code Generation
