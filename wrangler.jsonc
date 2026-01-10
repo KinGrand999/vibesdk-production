@@ -171,7 +171,7 @@
         },
         "CUSTOM_DOMAIN": "app.kingrand.io",
         "MAX_SANDBOX_INSTANCES": "9999",
-        "SANDBOX_INSTANCE_TYPE": "standard-2"
+        "SANDBOX_INSTANCE_TYPE": "standard-1"
     },
 	"workers_dev": false,
 	"preview_urls": false
